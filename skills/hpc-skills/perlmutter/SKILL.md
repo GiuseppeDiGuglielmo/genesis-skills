@@ -53,6 +53,40 @@ Perlmutter is NERSC's GPU-accelerated Cray EX system at Lawrence Berkeley Nation
 
 Specify with `--qos=<name>`, e.g. `#SBATCH --qos=debug`.
 
+### Project-specific QOS
+
+The table lists the public QOS tiers only. Many projects have extra QOS values,
+such as reserved, express or project-named queues, which can start much
+sooner than `regular`. Check what your user and account can use before
+choosing a QOS:
+
+```bash
+sacctmgr -n -P show assoc user=$USER format=account,qos
+```
+
+Each output line is `account|qos1,qos2,...`. Pass the account with `-A` and the
+QOS with `--qos`. Their limits (walltime, node count, priority) are set per
+QOS, so look them up rather than assuming the public values:
+
+```bash
+sacctmgr -n -P show qos <name> format=name,priority,maxwall,maxtrespu
+```
+
+If a dedicated QOS is available for your project, prefer it over `regular`.
+
+**AmSC / Genesis projects (`amsc*` accounts):** NERSC provides AmSC
+projects with a dedicated express QOS. Check with `sacctmgr` that your account has it.
+
+| QOS | Max walltime | Node limit | Priority | Notes |
+|-----|-------------|-----------|----------|-------|
+| `express_amsc` | 6 hr | 32 nodes in total, shared by every AmSC user | ~3.7× `regular` | CPU jobs; same charge rate as regular |
+| `express_amsc_g` | 6 hr | same shared 32-node pool | same | GPU-account variant |
+
+Jobs that need more than 6 hours fail on this QOS. Use `regular` for them, or split
+the work. The 32-node cap is shared, so check current use before a large submission:
+`scontrol show assoc_mgr flags=qos qos=express_amsc | grep GrpTRES`
+(the `node=32(N)` field shows N nodes already in use).
+
 ## Quick Slurm Reference
 
 ```bash
