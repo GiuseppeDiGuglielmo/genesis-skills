@@ -77,15 +77,26 @@ QOS, so look them up rather than assuming the public values:
 sacctmgr -n -P show qos <name> format=name,priority,maxwall,maxtrespu
 ```
 
-If a dedicated QOS is available for your project, prefer it over `regular`.
+Not every QOS in that list can be requested directly. Some, such as
+`regular_0`, `regular_1`, `gpu_regular` or `overrun`, are internal targets
+that the scheduler routes jobs to; asking for them by name fails. Confirm a QOS
+accepts your job before relying on it, without submitting anything:
+
+```bash
+sbatch --test-only -A <account> -C cpu --qos=<name> -N 1 -t 1:00:00 --wrap=hostname
+```
+
+A usable QOS prints an estimated start time; an unusable one prints an
+allocation failure. If a dedicated QOS is available for your project, prefer it
+over `regular`.
 
 **AmSC / Genesis projects (`amsc*` accounts):** NERSC provides AmSC and
 Genesis projects with a dedicated express QOS. Check with `sacctmgr` that your account has it.
 
 | QOS | Max walltime | Node limit | Priority | Notes |
 |-----|-------------|-----------|----------|-------|
-| `express_amsc` | 6 hr | 32 nodes in total, shared by every AmSC and Genesis user | ~3.7× `regular` | CPU jobs; same charge rate as regular |
-| `express_amsc_g` | 6 hr | same shared 32-node pool | same | GPU-account variant |
+| `express_amsc` | 6 hr | 32 nodes in total, shared by every AmSC and Genesis user | ~3.7× `regular` | Same charge rate as regular |
+| `express_amsc_g` | 6 hr | same shared 32-node pool | same | Paired with `amsc*_g` accounts; in practice both QOS accept CPU and GPU jobs |
 
 Jobs that need more than 6 hours fail on this QOS. Use `regular` for them, or split
 the work. The 32-node cap is shared, so check current use before a large submission:
