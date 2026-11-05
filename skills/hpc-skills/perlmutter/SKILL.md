@@ -91,12 +91,13 @@ Genesis projects with a dedicated express QOS. Check with `sacctmgr` that your a
 | QOS | Max walltime | Node limit | Priority | Notes |
 |-----|-------------|-----------|----------|-------|
 | `express_amsc` | 6 hr | 32 nodes in total, shared by every AmSC and Genesis user | ~3.7× `regular` | Same charge rate as regular |
-| `express_amsc_g` | 6 hr | same shared 32-node pool | same | Paired with `amsc*_g` accounts; in practice both QOS accept CPU and GPU jobs |
+| `express_amsc_g` | 6 hr | its own 32-node pool, separate from `express_amsc` | same | Paired with `amsc*_g` accounts; in practice both QOS accept CPU and GPU jobs |
 
 Jobs that need more than 6 hours fail on this QOS. Use `regular` for them, or split
-the work. The 32-node cap is shared, so check current use before a large submission:
-`scontrol show assoc_mgr flags=qos qos=express_amsc | grep GrpTRES`
-(the `node=32(N)` field shows N nodes already in use).
+the work. Each QOS has its own 32-node cap shared by every user of that QOS, so
+check current use before a large submission:
+`scontrol show assoc_mgr flags=qos qos=<express_amsc|express_amsc_g> | grep GrpTRES`
+(the `node=32(N)` field shows N nodes already in use in that QOS).
 
 ## Quick Slurm Reference
 
