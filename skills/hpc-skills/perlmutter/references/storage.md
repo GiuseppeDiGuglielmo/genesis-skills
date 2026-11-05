@@ -9,7 +9,7 @@
 | Home | `$HOME` | `/global/homes/<l>/<user>` | 40 GB | None | Source code, scripts, configs |
 | Scratch | `$SCRATCH` / `$PSCRATCH` | `/pscratch/sd/<l>/<user>` | 20 TB | **8-week auto-purge** | Job input/output |
 | Community FS | `$CFS` | `/global/cfs/cdirs/<proj>/` | varies | None | Long-term project data |
-| Node-local | `$TMPDIR` | node-local path | ~200 GB | Job lifetime | Fast temporary scratch |
+| Node-local | `/tmp` | node memory | counts against node RAM | Job lifetime | Small temporary files only |
 | HPSS (tape) | — | via `hsi`/`htar` | varies | None | Long-term archival |
 
 ---
@@ -69,21 +69,27 @@ lfs setstripe -c -1 max_stripe_dir/    # use all available OSTs
 
 ---
 
-## Using `$TMPDIR` (Node-Local Storage)
+## Node-Local Temporary Space
 
-Each compute node has a fast local SSD accessible via `$TMPDIR`. Useful for:
-- Many small random-access reads
-- Staging input data to avoid Lustre contention
-- Temporary intermediate files
+Perlmutter compute nodes have **no local disk** (`scontrol show node <nid>` reports
+`TmpDisk=0`). Node-local temporary space lives in node memory, so every byte
+written there reduces the RAM available to the job (512 GB per CPU node, 256 GB
+per GPU node). It is still useful for:
+- Many small random-access reads that would hammer Lustre
+- Small temporary intermediate files
+
+Keep staged data well below the node's free memory; for anything large, read
+from `$SCRATCH` directly.
 
 ```bash
 # In your job script:
-cp $SCRATCH/input.h5 $TMPDIR/input.h5   # stage in
-./my_app --input $TMPDIR/input.h5 --output $TMPDIR/output.h5
-cp $TMPDIR/output.h5 $SCRATCH/results/  # stage out
+TMP=${TMPDIR:-/tmp}
+cp $SCRATCH/input.h5 $TMP/input.h5   # stage in (uses node RAM)
+./my_app --input $TMP/input.h5 --output $TMP/output.h5
+cp $TMP/output.h5 $SCRATCH/results/  # stage out
 ```
 
-`$TMPDIR` is cleaned automatically when the job ends.
+Node-local files are removed when the job ends.
 
 ---
 
@@ -140,6 +146,6 @@ CFS is slower than `$SCRATCH` — use `$SCRATCH` for job I/O and copy finished r
 1. **Always write job output to `$SCRATCH`**, never `$HOME`.
 2. **Copy important results to `$CFS` promptly** — don't rely on `$SCRATCH` for anything you need longer than a few weeks.
 3. **Use `lfs setstripe`** on output directories before large parallel writes.
-4. **Use `$TMPDIR`** for datasets that are read many times per job — copy once, then read from fast local storage.
+4. **Use node-local `/tmp` sparingly**: it is memory, not disk, so stage only small, frequently read files.
 5. **Archive to HPSS** for any data you want to keep long-term but don't actively use.
 6. **Run `myquota` regularly** to avoid unexpected quota-exceeded errors in jobs.
