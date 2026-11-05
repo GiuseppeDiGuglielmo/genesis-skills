@@ -61,7 +61,6 @@ Use `shared` when your job needs only 1 GPU and you want to avoid being charged 
 #SBATCH -n 1                           # 1 MPI task
 #SBATCH -c 32                          # 32 CPU cores
 #SBATCH --gpus-per-task=1             # 1 GPU
-#SBATCH --mem=80G                      # Memory (not the full node amount)
 #SBATCH -t 2:00:00
 #SBATCH -o shared_%j.out
 
@@ -71,6 +70,8 @@ srun ./my_single_gpu_app
 ```
 
 You are billed for the fraction of the node you use, not the full node.
+Do not add `--mem` to shared GPU jobs: on Perlmutter they are rejected when
+`--mem` is set. Leave memory to the scheduler.
 
 ---
 
@@ -93,7 +94,9 @@ module load cudatoolkit cray-mpich
 srun ./my_app --test-mode
 ```
 
-Debug jobs start fast; max 30 minutes and 8 nodes.
+Debug jobs are limited to 30 minutes and 8 nodes. They usually start sooner
+than regular jobs but can still wait hours when the machine is busy; check with
+`sbatch --test-only`.
 
 ---
 

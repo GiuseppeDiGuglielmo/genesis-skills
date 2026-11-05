@@ -43,7 +43,7 @@ Perlmutter is NERSC's GPU-accelerated Cray EX system at Lawrence Berkeley Nation
 
 | QOS | Max walltime | Max nodes | SU cost | Notes |
 |-----|-------------|-----------|---------|-------|
-| `debug` | 30 min | 8 (GPU), 8 (CPU) | 1× | Fast start; use for testing |
+| `debug` | 30 min | 8 (GPU), 8 (CPU) | 1× | Use for testing; usually starts sooner than regular, but not always immediately |
 | `regular` | 12 hr | 256 (GPU), 512 (CPU) | 1× | Standard production |
 | `premium` | 24 hr | same as regular | 2× | Higher priority |
 | `preempt` | 48 hr | larger | 0.25× (GPU) / 0.5× (CPU) | Discounted; may be preempted |
@@ -123,7 +123,7 @@ iris jobs --project myproject # filter by project
 | `$HOME` | `/global/homes/u/user` | 40 GB | None | Code, configs |
 | `$SCRATCH` / `$PSCRATCH` | `/pscratch/sd/u/user` | 20 TB | **8-week auto-purge** | Job I/O |
 | `$CFS` | `/global/cfs/cdirs/<proj>` | varies | None | Long-term project data |
-| `$TMPDIR` | node-local | ~200 GB | Job lifetime | Fast temporary scratch |
+| `/tmp` | node-local, in RAM | shares node memory | Job lifetime | Small temporary files; no local disk |
 
 > **Warning:** Files in `$SCRATCH` not accessed for 8 weeks are **automatically deleted** without notice. Always check ages with `lfs find $SCRATCH --atime +56 -maxdepth 2`.
 
