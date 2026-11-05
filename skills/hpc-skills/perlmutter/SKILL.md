@@ -74,12 +74,12 @@ sacctmgr -n -P show qos <name> format=name,priority,maxwall,maxtrespu
 
 If a dedicated QOS is available for your project, prefer it over `regular`.
 
-**AmSC / Genesis projects (`amsc*` accounts):** NERSC provides AmSC
-projects with a dedicated express QOS. Check with `sacctmgr` that your account has it.
+**AmSC / Genesis projects (`amsc*` accounts):** NERSC provides AmSC and
+Genesis projects with a dedicated express QOS. Check with `sacctmgr` that your account has it.
 
 | QOS | Max walltime | Node limit | Priority | Notes |
 |-----|-------------|-----------|----------|-------|
-| `express_amsc` | 6 hr | 32 nodes in total, shared by every AmSC user | ~3.7× `regular` | CPU jobs; same charge rate as regular |
+| `express_amsc` | 6 hr | 32 nodes in total, shared by every AmSC and Genesis user | ~3.7× `regular` | CPU jobs; same charge rate as regular |
 | `express_amsc_g` | 6 hr | same shared 32-node pool | same | GPU-account variant |
 
 Jobs that need more than 6 hours fail on this QOS. Use `regular` for them, or split
