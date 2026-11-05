@@ -15,6 +15,9 @@
 #SBATCH --time=01:00:00           # Wall-clock limit: HH:MM:SS or D-HH:MM:SS
 
 # --- Queue / partition ---
+# NOTE: partition names are site-specific (check: sinfo). Some sites, such as
+# NERSC Perlmutter, select nodes with --constraint (cpu/gpu) and --qos instead
+# of --partition, and reject this line as written; see the perlmutter skill.
 #SBATCH --partition=regular       # Partition name (check: sinfo)
 # #SBATCH --qos=regular           # Uncomment if QOS is separate from partition
 # #SBATCH --exclusive             # Uncomment for exclusive node access

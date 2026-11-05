@@ -44,14 +44,19 @@ Perlmutter is NERSC's GPU-accelerated Cray EX system at Lawrence Berkeley Nation
 | QOS | Max walltime | Max nodes | SU cost | Notes |
 |-----|-------------|-----------|---------|-------|
 | `debug` | 30 min | 8 (GPU), 8 (CPU) | 1× | Fast start; use for testing |
-| `regular` | 12 hr | 256 (GPU), 512 (CPU) | 1× | Standard production |
-| `premium` | 24 hr | same as regular | 2× | Higher priority |
+| `regular` | 48 hr | 256 (GPU), 512 (CPU) | 1× | Standard production |
+| `premium` | 48 hr | same as regular | 2× | Higher priority; not every project has it enabled |
 | `preempt` | 48 hr | larger | 0.25× (GPU) / 0.5× (CPU) | Discounted; may be preempted |
-| `shared` | 12 hr | — | fractional | Partial node, billed per resource |
+| `shared` | 48 hr | — | fractional | Partial node, billed per resource |
 
 **Big job discount:** jobs using ≥128 GPU nodes or ≥256 CPU nodes are charged at 50% SU rate.
 
 Specify with `--qos=<name>`, e.g. `#SBATCH --qos=debug`.
+
+Walltime limits change over time. Check the current value with
+`sacctmgr -n -P show qos <name> format=name,maxwall`, and test a request without
+submitting it with `sbatch --test-only job.sh`. A QOS your project lacks fails
+with "Invalid qos specification".
 
 ### Project-specific QOS
 
@@ -141,10 +146,14 @@ srun ./my_mpi_app
 
 ```bash
 # CLI (run on any Perlmutter login node)
-iris                          # summary of your projects
-iris hours                    # CPU/GPU hours used vs. allocated
-iris jobs                     # recent job history with charges
-iris jobs --project myproject # filter by project
+iris                          # your charged vs. allocated hours, per project
+iris project myproject        # project totals
+iris project myproject -u     # per-user breakdown
+iris qos <qos>                # users who have access to a QOS
+
+# Per-job charges are not in the CLI; use the Jobs tab on iris.nersc.gov,
+# or sacct for the billing weight of your own jobs:
+sacct -u $USER -X -S <date> --format=JobID,QOS,NNodes,Elapsed,AllocTRES%60
 
 # Web
 # https://iris.nersc.gov  — "My Account" tab shows remaining balance
