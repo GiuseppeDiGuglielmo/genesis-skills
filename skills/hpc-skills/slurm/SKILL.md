@@ -88,6 +88,12 @@ srun ./my_application
 | `--mail-type` | `END,FAIL` | Email notifications |
 | `--mail-user` | `user@host` | Email address |
 
+Partition and QOS names differ between clusters; check them with `sinfo` and
+`sacctmgr show assoc user=$USER format=account,qos`. On systems that use
+constraints instead of partitions (e.g. NERSC Perlmutter: `-C cpu` / `-C gpu`
+plus `--qos`), a `--partition` line copied from these examples is rejected.
+Use the system-specific skill when one exists.
+
 ### Output Filename Tokens
 
 | Token | Meaning |

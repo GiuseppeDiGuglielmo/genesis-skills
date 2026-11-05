@@ -19,6 +19,9 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=16G
 #SBATCH --time=00:30:00
+# NOTE: partition names are site-specific (check: sinfo). Some sites, such as
+# NERSC Perlmutter, select nodes with --constraint (cpu/gpu) and --qos instead
+# of --partition, and reject this line as written; see the perlmutter skill.
 #SBATCH --partition=regular
 
 # --- Output files (use %A for array job ID, %a for task index) ---

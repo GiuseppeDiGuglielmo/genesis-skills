@@ -7,25 +7,25 @@
 ### `iris` Command (NERSC-specific)
 
 The `iris` CLI is the primary tool for checking NERSC allocations from the command line.
+Its subcommands are `user`, `project`, `qos` and `graphql`; run `iris <command> --help`
+for options. It has no per-job history and no storage quotas: use the iris web
+interface for job charges and `myquota` for storage.
 
 ```bash
-# Summary of all your projects
+# Your charged vs. allocated hours, per project (same as `iris user $USER`)
 iris
 
-# CPU and GPU hours: allocated vs. used
-iris hours
+# Project totals: charged vs. allocated
+iris project myproject
 
-# Recent job history with SU charges
-iris jobs
+# Usage by user within a project
+iris project myproject -u
 
-# Filter by project
-iris jobs --project myproject
+# Users with access to a given QOS
+iris qos <qos>
 
-# Usage by user within a project (PIs and managers)
-iris usage --project myproject
-
-# Storage quotas
-iris storage
+# Machine-readable output
+iris project --json myproject   # flag goes after the subcommand
 ```
 
 ### `iris` Web Interface

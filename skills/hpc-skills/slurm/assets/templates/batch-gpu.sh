@@ -16,6 +16,9 @@
 #SBATCH --time=04:00:00           # Wall-clock limit
 
 # --- Queue / partition ---
+# NOTE: partition names are site-specific (check: sinfo). Some sites, such as
+# NERSC Perlmutter, select nodes with --constraint (cpu/gpu) and --qos instead
+# of --partition, and reject this line as written; see the perlmutter skill.
 #SBATCH --partition=gpu           # GPU partition name (check: sinfo)
 # #SBATCH --gres=gpu:a100:4       # Alternative: request specific GPU model
 
