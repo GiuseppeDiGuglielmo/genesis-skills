@@ -72,9 +72,10 @@ lfs setstripe -c -1 max_stripe_dir/    # use all available OSTs
 ## Node-Local Temporary Space
 
 Perlmutter compute nodes have **no local disk** (`scontrol show node <nid>` reports
-`TmpDisk=0`). Node-local temporary space lives in node memory, so every byte
-written there reduces the RAM available to the job (512 GB per CPU node, 256 GB
-per GPU node). It is still useful for:
+`TmpDisk=0`). Inside a job `$TMPDIR` is set to `/tmp`, which is a `tmpfs` in node
+memory: on a CPU node it is capped at about 350 GB of the node's 512 GB, and a
+4 GB file written there raised used memory by 4 GB. Every byte in `/tmp` reduces
+the RAM available to the job. It is still useful for:
 - Many small random-access reads that would hammer Lustre
 - Small temporary intermediate files
 
