@@ -30,6 +30,21 @@ touch my_important_file.h5
 cp -r $SCRATCH/results/ $CFS/my_project/archive/
 ```
 
+Access time is per file, so a tree that is used every day can still lose the files
+nobody opens. Two cases seen on Perlmutter (2026-11):
+- **Python virtual environments.** Python imports the cached `.pyc` files, so the
+  `.py` sources and `*.dist-info/RECORD` files look unread and get purged. The venv
+  then fails with errors like `cannot import name 'module_util' from
+  'tensorflow.python.tools'`. A venv where `.pyc` files far outnumber `.py` files
+  has been hit.
+- **Vendor tool installs** (e.g. an EDA tool copied to `$SCRATCH`): rarely opened
+  data files and helper binaries disappear, leaving dangling symlinks and errors
+  that look unrelated (license feature errors, missing utilities).
+
+Keep software (venvs, conda envs, tool installs) in `/global/common/software/<project>`
+(read-optimised, not purged) or `$HOME`, and data in `$CFS`; use `$SCRATCH` only for
+job I/O.
+
 ---
 
 ## Checking Quotas
@@ -92,6 +107,16 @@ cp $TMP/output.h5 $SCRATCH/results/  # stage out
 ```
 
 Node-local files are removed when the job ends.
+
+### Memory a whole-node job really gets
+
+A CPU node reports `RealMemory=515100` MB but SLURM keeps `MemSpecLimit=27298` MB
+for the system (`scontrol show node <nid>`), so `--mem=0` (all of it) gives a job
+about 488 GB. `/proc/meminfo` and `free` inside the job still show the whole node,
+so tools that throttle on free memory (GNU parallel `--memfree`, `--memsuspend`)
+see ~27 GB more than the job can use; set their threshold that much higher. On a
+`shared` node `/proc/meminfo` also counts other users' jobs, so such throttles
+only make sense on a whole node.
 
 ---
 
